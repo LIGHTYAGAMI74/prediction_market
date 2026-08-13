@@ -65,8 +65,13 @@ router.post("/signin", async (req,res)=>{
             message:"user is not registered"
         })
     }
-    const token = jwt.sign(userExist.id,"secret")
-    
+    const token = jwt.sign({id:userExist.id},"secret")
+    res.cookie("token",token)
+    res.json({
+        message:" user is logged in ",
+        id:userExist.id
+    })    
 
     
 })
+export default router
