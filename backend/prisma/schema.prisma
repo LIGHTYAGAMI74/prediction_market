@@ -1,0 +1,119 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User{
+  id String @id @default(uuid())
+  username String
+  email String
+  password String
+  balance Float @default(0)
+  role    role 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  holdings Holding[]
+  trades Trade[]
+  transaction Transaction[]
+}
+
+enum role{
+  User
+  Admin
+}
+
+model Trade {
+  id String @id @default(uuid())
+  userId String
+  user User @relation(fields: [userId], references: [id])
+  marketId String
+  market Market @relation(fields: [marketId], references: [id])
+  optionId String
+  option Option @relation(fields: [optionId], references: [id])
+  quantity Int
+  price Float
+  type tradeType
+  createdAt DateTime @default(now())
+
+}
+
+enum tradeType{
+  BUY 
+  SELL
+}
+
+enum MarketStatus {
+  OPEN
+  CLOSED
+  RESOLVED
+  CANCELLED
+}
+
+model Market {
+  id          String       @id @default(cuid())
+  title       String
+  description String?
+  category    String
+
+  status      MarketStatus @default(OPEN)
+
+  closeAt     DateTime
+
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  options     Option[]
+  trades      Trade[]
+}
+
+model Option {
+  id       String  @id @default(cuid())
+  title    String
+  price    Decimal
+  volume   Decimal @default(0)
+
+  marketId String
+  market   Market  @relation(fields: [marketId], references: [id])
+
+  trades   Trade[]
+  holdings Holding[]
+}
+
+model Holding {
+  id String @id @default(uuid())
+  userId String
+  user User @relation(fields: [userId], references: [id])
+  optionId String
+  option Option @relation(fields: [optionId], references: [id])
+  quantity Int
+  avgPrice Float
+
+}
+
+
+model Transaction {
+  id  String @id @default(uuid())
+  userId String
+  user User @relation(fields: [userId],references: [id])
+  amount Int
+  type transactionType
+  description String
+}
+
+enum transactionType{
+ DEPOSIT
+  WITHDRAW
+  BUY
+  SELL
+  PAYOUT
+  REFUND
+}
