@@ -12,4 +12,4 @@ app.get("/",(req,res)=>{
 app.use("/auth",auth)
 
 
-app.listen(3000)
+app.listen(5000)
